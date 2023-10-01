@@ -1,7 +1,6 @@
-import { Point } from "../Model/Point.js";
-import { DrawElement } from "../Model/DrawElement.js";
+import { Point } from "../Model/Point";
+import { DrawElement } from "../Model/DrawElement";
 import { BaseElement } from "./BaseElement";
-
 
 export class Line extends BaseElement {
     private p1:Point | null =null

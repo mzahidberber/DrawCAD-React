@@ -1,7 +1,5 @@
-import { Scene } from "../../View/Scene.js";
-import { DrawElement } from "../../Model/DrawElement.js";
-import { CustomSVGElement } from "../CustomSVGElement.js";
-import { IElementObj } from "./IElementObj.js";
+import { DrawElement } from "../../Model/DrawElement";
+import { IElementObj } from "./IElementObj";
 
 
 export abstract class BaseElementAbstract implements IElementObj{

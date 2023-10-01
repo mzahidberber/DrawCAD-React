@@ -1,10 +1,8 @@
 import React, { Component,useEffect } from 'react';
 import { PointGeo } from '../ViewModel/PointGeo';
 import { IElementObj } from '../ViewModel/abstract/IElementObj';
-import { Line } from '../ViewModel/Line';
-import { DrawElement } from '../Model/DrawElement';
-import { Point } from '../Model/Point';
 import { DrawController } from '../Controller/DrawController';
+
 
 interface SceneProps {
     width: number;
@@ -52,12 +50,12 @@ export class Scene extends Component<SceneProps> {
       this.canvas = this.canvasRef.current;
       this.scontext = this.canvas ? this.canvas.getContext('2d') : null;
       this.clear()
-      this.drawBackground(new PointGeo(0,0),new PointGeo(1000,1000));
+      this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000));
     }
   
     componentDidUpdate() {
       this.clear()
-      this.drawBackground(new PointGeo(0,0),new PointGeo(1000,1000));
+      this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000));
       this.print()
     }
 
@@ -77,16 +75,24 @@ export class Scene extends Component<SceneProps> {
     }
 
     move(event:React.MouseEvent<HTMLCanvasElement>){
-        // console.log(event)
+      const x = event.nativeEvent.offsetX;
+      const y = event.nativeEvent.offsetY;
+      // console.log(x,y)
     }
   
     render() {
-      return <canvas 
+      return(
+        <>
+        <canvas 
       onClick={(event) => this.click(event)} 
       onMouseMove={(event)=>this.move(event)} 
       ref={this.canvasRef} 
       width={this.props.width} 
-      height={this.props.height} />;
+      height={this.props.height} />
+        </>
+    
+      ) 
+      
     }
   
     public drawBackground(p1:PointGeo,p2:PointGeo){
