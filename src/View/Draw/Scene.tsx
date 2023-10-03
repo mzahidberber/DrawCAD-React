@@ -1,8 +1,9 @@
 import React, { Component,useEffect } from 'react';
-import { PointGeo } from '../Controller/Helper/PointGeo';
-import { IElementObj } from '../ViewModel/abstract/IElementObj';
-import { DrawController } from '../Controller/DrawController';
-import { ElementContext } from '../ViewModel/ElementContext';
+import { PointGeo } from '../../Controller/Helper/PointGeo';
+import { DrawController } from '../../Controller/DrawController';
+import { ElementContext } from '../../ViewModel/DrawElements/ElementContext';
+import { IElementObj } from '../../ViewModel/DrawElements/abstract/IElementObj';
+import { CommandType } from '../../Controller/enum/CommandType';
 
 
 interface SceneProps {
@@ -21,8 +22,14 @@ interface SceneProps {
 export class Scene extends Component<SceneProps,IState> {
     private canvasRef: React.RefObject<HTMLCanvasElement>
     private canvas:HTMLCanvasElement | null
-    private scontext:CanvasRenderingContext2D | null
+    private _scontext:CanvasRenderingContext2D | null
     private elementContext:ElementContext
+
+    
+    public get scontext() : CanvasRenderingContext2D | null {
+      return this._scontext
+    }
+    
     
     constructor(props: SceneProps) {
       super(props)
@@ -30,20 +37,55 @@ export class Scene extends Component<SceneProps,IState> {
         items: [],
       }
       this.elementContext=new ElementContext()
-      this.elementContext.setElementObj(0)
       this.canvasRef = React.createRef()
       this.canvas = this.canvasRef.current
-      this.scontext = this.canvas ? this.canvas.getContext('2d') : null
+      this._scontext = this.canvas ? this.canvas.getContext('2d') : null
     
     }
 
+    public startCommand(command:CommandType):void{
+      this.props.contoller.startCommand(command)
+      this.elementContext.setElementType(command)
+    }
 
-    public print(){
-        if (this.scontext) {
-            this.state.items.forEach(element => {
-                element.paint(this.scontext)
-            });
+    private trasformPath(path:Path2D,matrix:DOMMatrix):Path2D{
+      let newPath=new Path2D()
+      newPath.addPath(path,matrix)
+      return newPath
+    }
+    private print(){
+      this.state.items.forEach(element => {
+        if (this._scontext) {
+          var pathBo=new Path2D()
+          element.boundaryRect(pathBo)
+          let h = new DOMMatrix();
+          h.e = this.props.height/2;
+          h.f = this.props.width/2;
+          h.scaleSelf(1,-1)
+          var nnPath= this.trasformPath(pathBo,h)
+          element.path=nnPath
+          this._scontext.lineWidth = 1
+          this._scontext.strokeStyle = "white";
+          this._scontext.fillStyle="transparent"
+          this._scontext.fill(nnPath)
+          this._scontext.stroke(nnPath)
+
+
+          var path=new Path2D()
+          element.paint(path)
+          let m = new DOMMatrix();
+          m.e = this.props.height/2;
+          m.f = this.props.width/2;
+          m.scaleSelf(1,-1)
+          var nPath= this.trasformPath(path,m)
+          this._scontext.lineWidth = 2
+          this._scontext.strokeStyle = "red";
+          this._scontext.stroke(nPath)
+
+          
         }
+      })
+        
     }
 
     public addElement(element:IElementObj){
@@ -56,12 +98,13 @@ export class Scene extends Component<SceneProps,IState> {
     }
     componentDidMount() {
       this.canvas = this.canvasRef.current;
-      this.scontext = this.canvas ? this.canvas.getContext('2d') : null
+      this._scontext = this.canvas ? this.canvas.getContext('2d') : null
       this.clear()
       this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000))
     }
   
     componentDidUpdate() {
+      console.log("update")
       this.clear()
       this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000))
       this.print()
@@ -69,8 +112,8 @@ export class Scene extends Component<SceneProps,IState> {
     }
 
     clear(){
-      if (this.scontext) {
-        this.scontext.clearRect(0,0,this.props.width,this.props.height)
+      if (this._scontext) {
+        this._scontext.clearRect(0,0,this.props.width,this.props.height)
       }
     }
 
@@ -79,23 +122,17 @@ export class Scene extends Component<SceneProps,IState> {
         const x = event.nativeEvent.offsetX
         const y = event.nativeEvent.offsetY
         const result= this.props.contoller.addPoint(this.props.sceneToScreen(new PointGeo(x,y)))
-        
+        if(result) this.elementContext.createElementInstance(result)
         var elemntObj=this.elementContext.elementObj
-        if(elemntObj && result){
-          var p1=this.props.screenToscene(new PointGeo(result.points[0].x,result.points[0].y))
-          var p2=this.props.screenToscene(new PointGeo(result.points[1].x,result.points[1].y))
-          result.points[0].x=p1.x
-          result.points[0].y=p1.y
-          result.points[1].x=p2.x
-          result.points[1].y=p2.y
-          elemntObj.setElementInformation(result)
+        if(elemntObj){
           this.addElement(elemntObj)
+          this.elementContext.setNull()
         } 
 
         for (let i = 0; i < this.state.items.length; i++) {
           const item = this.state.items[i];
-          if(this.scontext && item.path){
-            if (this.scontext.isPointInPath(item.path,x, y)){
+          if(this._scontext && item.path){
+            if (this._scontext.isPointInPath(item.path,x, y)){
               console.log(item)
               
             }
@@ -127,6 +164,14 @@ export class Scene extends Component<SceneProps,IState> {
     }
   
     public drawBackground(p1:PointGeo,p2:PointGeo){
+
+      if (this._scontext) {
+        this._scontext.beginPath()
+        this._scontext.fillStyle = "#000000"
+        this._scontext.fillRect(0,0,this.props.width,this.props.height)
+        this._scontext.stroke()
+    }
+
         let logHL=Math.log10(window.innerWidth)
         let logVL=Math.log10(window.innerHeight)
         let z1=10**(Math.round(logHL)+1)
@@ -149,28 +194,32 @@ export class Scene extends Component<SceneProps,IState> {
         for (let i = Math.ceil(p1.y / z3) * z3; i <= Math.ceil(p2.y / z3) * z3; i+=z3) {
             this.addLine(p1.x,Number(i),p2.x,Number(i))
         }
-        this.addXYLine(5000,0,5000,10000)
-        this.addXYLine(0,5000,10000,5000)
+        this.addXYLine(this.props.width/2,0,this.props.width/2,this.props.height)
+        this.addXYLine(0,this.props.height/2,this.props.width,this.props.width/2)
+
+        
         
     }
     addXYLine(x1:number,y1:number,x2:number,y2:number){
-          if (this.scontext) {
-            this.scontext.beginPath()
-            this.scontext.moveTo(x1,y1)
-            this.scontext.lineTo(x2,y2)
-            this.scontext.lineWidth=1
-            this.scontext.stroke()
+          if (this._scontext) {
+            this._scontext.beginPath()
+            this._scontext.moveTo(x1,y1)
+            this._scontext.lineTo(x2,y2)
+            this._scontext.lineWidth=1
+            this._scontext.strokeStyle = "green"
+            this._scontext.stroke()
         }
         
     }
 
     addLine(x1:number,y1:number,x2:number,y2:number){
-      if (this.scontext) {
-        this.scontext.beginPath()
-        this.scontext.moveTo(x1,y1)
-        this.scontext.lineTo(x2,y2)
-        this.scontext.lineWidth=0.3
-        this.scontext.stroke()
+      if (this._scontext) {
+        this._scontext.beginPath()
+        this._scontext.moveTo(x1,y1)
+        this._scontext.lineTo(x2,y2)
+        this._scontext.lineWidth=0.3
+        this._scontext.strokeStyle = "white"
+        this._scontext.stroke()
     }
     }
 

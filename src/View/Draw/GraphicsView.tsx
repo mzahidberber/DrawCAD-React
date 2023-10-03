@@ -1,7 +1,8 @@
 import React,{ Component, RefObject } from "react";
 import { Scene } from "./Scene";
-import { DrawController } from "../Controller/DrawController";
-import { PointGeo } from "../Controller/Helper/PointGeo";
+import { DrawController } from "../../Controller/DrawController";
+import { PointGeo } from "../../Controller/Helper/PointGeo";
+import { CommandType } from "../../Controller/enum/CommandType";
 
 interface IGraphicsView{
     controller:DrawController
@@ -17,23 +18,26 @@ export class GraphicsView extends Component<IGraphicsView,IState>{
     private panLock:boolean=false
     private pan1:PointGeo=new PointGeo(0,0)
     private pan2:PointGeo=new PointGeo(0,0)
-     private coordinateLabelRef:RefObject<HTMLHeadingElement>
-     private sceneRef:RefObject<Scene>
+    private coordinateLabelRef:RefObject<HTMLHeadingElement>
+    private sceneRef:RefObject<Scene>
 
-     constructor(props:IGraphicsView){
-        super(props)
-        this.state={
-            origin:new PointGeo(500,500),
-            zoom:1.00,
-            cameraPosition:new PointGeo(0,0)
-        }
-        this.coordinateLabelRef=React.createRef()
-        this.sceneRef=React.createRef()
-        
-     }
 
-     
+    constructor(props:IGraphicsView){
+       super(props)
+       this.state={
+           origin:new PointGeo(500,500),
+           zoom:1.00,
+           cameraPosition:new PointGeo(0,0)
+       }
+       this.coordinateLabelRef=React.createRef()
+       this.sceneRef=React.createRef()
+       
+    }
 
+    startCommand(command:CommandType){
+        this.sceneRef.current?.startCommand(command)
+    }
+    
     sceneToScreen(point:PointGeo):PointGeo{
         let x= (point.x-this.state.origin.x)*this.state.zoom+this.state.cameraPosition.x
         let y=(point.y-this.state.origin.y)*this.state.zoom+this.state.cameraPosition.y

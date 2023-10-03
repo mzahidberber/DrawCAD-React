@@ -1,5 +1,5 @@
 import './App.css';
-import { Window } from './View/Window';
+import { Window } from './View/Draw/Window';
 import { Stage, Layer, Rect, Text, Circle, Line } from 'react-konva';
 function App() {
   return (
