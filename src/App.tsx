@@ -4,7 +4,7 @@ import { Stage, Layer, Rect, Text, Circle, Line } from 'react-konva';
 function App() {
   return (
     <div className="App">
-       <Stage width={100} height={100}>
+       {/* <Stage width={100} height={100}>
        <Layer>
         <Rect
           x={10}
@@ -47,7 +47,7 @@ function App() {
           onClick={clicka}>
         </Line>
       </Layer>
-    </Stage>
+    </Stage> */}
         <Window/>
     </div>
   );

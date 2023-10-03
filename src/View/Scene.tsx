@@ -1,62 +1,71 @@
 import React, { Component,useEffect } from 'react';
-import { PointGeo } from '../ViewModel/PointGeo';
+import { PointGeo } from '../Controller/Helper/PointGeo';
 import { IElementObj } from '../ViewModel/abstract/IElementObj';
 import { DrawController } from '../Controller/DrawController';
+import { ElementContext } from '../ViewModel/ElementContext';
 
 
 interface SceneProps {
-    width: number;
-    height: number;
+    width: number
+    height: number
     contoller:DrawController
+    screenToscene:(p:PointGeo)=>PointGeo
+    sceneToScreen:(p:PointGeo)=>PointGeo
+  }
+
+  interface IState{
+    items:IElementObj[]
   }
   
 
-export class Scene extends Component<SceneProps> {
-    private canvasRef: React.RefObject<HTMLCanvasElement>;
-    private canvas:HTMLCanvasElement | null;
-    private scontext:CanvasRenderingContext2D | null;
-    private items:IElementObj[]=[]
+export class Scene extends Component<SceneProps,IState> {
+    private canvasRef: React.RefObject<HTMLCanvasElement>
+    private canvas:HTMLCanvasElement | null
+    private scontext:CanvasRenderingContext2D | null
+    private elementContext:ElementContext
     
     constructor(props: SceneProps) {
-      super(props);
+      super(props)
       this.state = {
         items: [],
-      };
-      this.canvasRef = React.createRef();
-      this.canvas = this.canvasRef.current;
-      this.scontext = this.canvas ? this.canvas.getContext('2d') : null;
+      }
+      this.elementContext=new ElementContext()
+      this.elementContext.setElementObj(0)
+      this.canvasRef = React.createRef()
+      this.canvas = this.canvasRef.current
+      this.scontext = this.canvas ? this.canvas.getContext('2d') : null
+    
     }
 
 
     public print(){
         if (this.scontext) {
-            this.items.forEach(element => {
+            this.state.items.forEach(element => {
                 element.paint(this.scontext)
             });
         }
     }
 
     public addElement(element:IElementObj){
-        this.items.push(element)
-        this.forceUpdate()
-        // this.setState((prevState)=>{
-        //   return {
-        //     items: [...prevState.items, element],
-        //   }
-        // })
+        this.setState((prevState)=>{
+          return {
+            items: [...prevState.items, element],
+          }
+        })
         
     }
     componentDidMount() {
       this.canvas = this.canvasRef.current;
-      this.scontext = this.canvas ? this.canvas.getContext('2d') : null;
+      this.scontext = this.canvas ? this.canvas.getContext('2d') : null
       this.clear()
-      this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000));
+      this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000))
     }
   
     componentDidUpdate() {
       this.clear()
-      this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000));
+      this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000))
       this.print()
+      
     }
 
     clear(){
@@ -65,12 +74,33 @@ export class Scene extends Component<SceneProps> {
       }
     }
 
+
     click(event: React.MouseEvent<HTMLCanvasElement>){
-        const x = event.nativeEvent.offsetX;
-        const y = event.nativeEvent.offsetY;
-        const result= this.props.contoller.addPoint(new PointGeo(x,y))
-        if(result){
-          this.addElement(result)
+        const x = event.nativeEvent.offsetX
+        const y = event.nativeEvent.offsetY
+        const result= this.props.contoller.addPoint(this.props.sceneToScreen(new PointGeo(x,y)))
+        
+        var elemntObj=this.elementContext.elementObj
+        if(elemntObj && result){
+          var p1=this.props.screenToscene(new PointGeo(result.points[0].x,result.points[0].y))
+          var p2=this.props.screenToscene(new PointGeo(result.points[1].x,result.points[1].y))
+          result.points[0].x=p1.x
+          result.points[0].y=p1.y
+          result.points[1].x=p2.x
+          result.points[1].y=p2.y
+          elemntObj.setElementInformation(result)
+          this.addElement(elemntObj)
+        } 
+
+        for (let i = 0; i < this.state.items.length; i++) {
+          const item = this.state.items[i];
+          if(this.scontext && item.path){
+            if (this.scontext.isPointInPath(item.path,x, y)){
+              console.log(item)
+              
+            }
+          }
+          
         }
     }
 
@@ -78,17 +108,18 @@ export class Scene extends Component<SceneProps> {
       const x = event.nativeEvent.offsetX;
       const y = event.nativeEvent.offsetY;
       // console.log(x,y)
+      
     }
   
     render() {
       return(
         <>
         <canvas 
-      onClick={(event) => this.click(event)} 
-      onMouseMove={(event)=>this.move(event)} 
-      ref={this.canvasRef} 
-      width={this.props.width} 
-      height={this.props.height} />
+        onClick={(event) => this.click(event)} 
+        onMouseMove={(event)=>this.move(event)} 
+        ref={this.canvasRef} 
+        width={this.props.width} 
+        height={this.props.height} />
         </>
     
       ) 
@@ -120,6 +151,7 @@ export class Scene extends Component<SceneProps> {
         }
         this.addXYLine(5000,0,5000,10000)
         this.addXYLine(0,5000,10000,5000)
+        
     }
     addXYLine(x1:number,y1:number,x2:number,y2:number){
           if (this.scontext) {
@@ -141,4 +173,6 @@ export class Scene extends Component<SceneProps> {
         this.scontext.stroke()
     }
     }
+
+    
 }

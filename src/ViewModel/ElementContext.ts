@@ -1,25 +1,21 @@
-import { Circle } from "./Circle.js"
-import { Line } from "./Line.js"
-import { BaseElement } from "./BaseElement.js";
-import { DefaultElement } from "./DefaultElement.js";
+import { Circle } from "./Circle"
+import { Line } from "./Line"
+import { BaseElement } from "./BaseElement";
 export class ElementContext{
-    private _defaultElement:BaseElement=new DefaultElement()
-    private _element:BaseElement=this._defaultElement
+    private _element:BaseElement | null=null
     private _elementTypes:{ [name: number]: typeof BaseElement }={
         0:Line,
         1:Circle
 
     }
     
-    public getElementObj():BaseElement{
-        if (this._element===this._defaultElement){
-            throw new Error("ElementContext:Must Set Element")
-        }
+    
+    public get elementObj() : BaseElement | null {
         return this._element
     }
-
-    public setDefaultObj():void{
-        this._element=this._defaultElement
+    
+    public setObjNull():void{
+        this._element=null
     }
 
     public setElementObj(elementType:number):BaseElement{

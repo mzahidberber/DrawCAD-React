@@ -26,11 +26,9 @@ export class Window extends Component{
     render() {
         return (
             <>
-            
-            
+            <GraphicsView controller={this.drawController}/>
             <ElementTools controller={this.drawController} />
             <EditTools controller={this.drawController} />
-            <GraphicsView controller={this.drawController}/>
             </>
         )
     }

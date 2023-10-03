@@ -1,30 +1,28 @@
 import { Point } from "../Model/Point";
 import { DrawElement } from "../Model/DrawElement";
 import { BaseElement } from "./BaseElement";
-
+import { GeoMath } from "../Controller/Helper/GeoMath"
+import { PointGeo } from "../Controller/Helper/PointGeo";
 export class Line extends BaseElement {
     private p1:Point | null =null
     private p2:Point | null =null
+    
+    
     constructor (){
         super()
     }
-    public paint(context: CanvasRenderingContext2D | null): void {
-        let length=10
-        if (context && this.p1 && this.p2){
-            context.beginPath();
-            context.moveTo(this.p1.x,this.p1.y);
-            context.lineTo(this.p2.x,this.p2.y);
+    
+    
 
-            // context.moveTo(this.p1.x+length,this.p1.y);
-            // context.lineTo(this.p1.x+length,this.p2.y);
-            // context.lineTo(this.p2.x-length,this.p2.y);
-            // context.lineTo(this.p1.x-length,this.p1.y);
-            // context.lineTo(this.p1.x+length,this.p1.y);
-            
-            context.lineWidth = 1;
-            context.stroke();
-            context.closePath()
-            
+    public paint(context: CanvasRenderingContext2D | null): void {
+        if (context && this.p1 && this.p2){
+            context.beginPath()
+            context.moveTo(this.p1.x,this.p1.y)
+            context.lineTo(this.p2.x,this.p2.y)
+            context.lineWidth = 2
+            context.strokeStyle = "red";
+            context.stroke()
+            this.boundaryRect(context)
         }
     }
     public setElementInformation(element:DrawElement): void {
@@ -33,13 +31,27 @@ export class Line extends BaseElement {
         
     }
 
-    public boundaryRect(): void {
-        if (this.p1 != null && this.p2!=null){
-            let path=new Path2D()
-            path.rect(0,0,50,50)
+    public boundaryRect(context: CanvasRenderingContext2D | null): Path2D | null {
+        if (context && this.p1 && this.p2){
+            let aci=GeoMath.calculateAngle(this.p1.x, this.p1.y,this.p2.x, this.p2.y)
+            this.path = new Path2D();
+            this.path.moveTo(this.p1.x, this.p1.y)
+            let a=GeoMath.findPointOnCircle(new PointGeo(this.p1.x, this.p1.y),20,aci+90)
+            this.path.lineTo(a.x,a.y)
+            let b=GeoMath.findPointOnCircle(new PointGeo(this.p2.x, this.p2.y),20,aci+90)
+            this.path.lineTo(b.x,b.y)
+            let c=GeoMath.findPointOnCircle(new PointGeo(this.p2.x, this.p2.y),20,aci+270)
+            this.path.lineTo(c.x,c.y)
+            let d=GeoMath.findPointOnCircle(new PointGeo(this.p1.x, this.p1.y),20,aci+270)
+            this.path.lineTo(d.x,d.y)
+            this.path.lineTo(this.p1.x, this.p1.y)
+            context.strokeStyle="blue"
+            context.stroke(this.path)
+            context.strokeStyle="black"
+            return this.path
 
         }
-
+        return null
         
     }
 
@@ -84,7 +96,21 @@ export class Line extends BaseElement {
         return x1 < x0 && x0 < x2 && y1 < y0 && y0 < y2;
     }
     
-    
+    private defineLineAsRect(x1:number,y1:number,x2:number,y2:number,lineWidth:number):LineRec{
+        var dx = x2 - x1
+        var dy = y2 - y1
+        var lineLength = Math.sqrt(dx * dx + dy * dy)
+        var lineRadianAngle = Math.atan2(dy, dx)
+        return ({
+            translateX: x1,
+            translateY: y1,
+            rotation: lineRadianAngle,
+            rectX: 0,
+            rectY: -lineWidth / 2,
+            rectWidth: lineLength,
+            rectHeight: lineWidth
+        })
+    }
     
 
     findLineParameters(x1: number, y1: number, x2: number, y2: number): { m: number; b: number } {
@@ -109,3 +135,15 @@ export class Line extends BaseElement {
     
 
 }
+
+
+interface LineRec
+    {
+        translateX: number,
+        translateY: number,
+        rotation: number,
+        rectX: number,
+        rectY: number,
+        rectWidth: number,
+        rectHeight: number
+    }

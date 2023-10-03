@@ -2,7 +2,7 @@ import { DrawElement } from "../Model/DrawElement";
 import { BaseElementAbstract } from "./abstract/BaseElementAbstract";
 
 export class BaseElement extends BaseElementAbstract{
-    boundaryRect(): void {
+    boundaryRect(context: CanvasRenderingContext2D | null): Path2D | null  {
         throw new Error("Method not implemented.");
     }
     click(x:number,y:number): void {

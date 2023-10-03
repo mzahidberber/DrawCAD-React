@@ -1,7 +1,6 @@
-import { DrawElement } from "../Model/DrawElement.js";
-import { Point } from "../Model/Point.js";
-import { BaseElement } from "./BaseElement.js";
-import { CustomSVGElement } from "./CustomSVGElement.js";
+import { DrawElement } from "../Model/DrawElement";
+import { Point } from "../Model/Point";
+import { BaseElement } from "./BaseElement";
 
 
 export class Circle extends BaseElement {
