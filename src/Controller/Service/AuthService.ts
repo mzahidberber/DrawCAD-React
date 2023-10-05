@@ -1,19 +1,42 @@
 import { BaseService } from "./BaseService";
 import { Response } from "./Response";
+import { Token } from "./Token";
 import { UrlBuilder } from "./UrlBuilder";
-import { api } from "./Urls";
+import {  auth } from "./Urls";
+import { User } from "./User";
 
 
 export class AuthService extends BaseService{
-    async createToken(email:string,password:string):Promise<Response>{
-        let connectionString=new UrlBuilder().url(api).url("auth").url("createtoken").build()
-        const reponse= await this.post(connectionString,new Headers({
-            // 'Authorization': `Bearer ${token}`, 
-            'Content-Type': 'application/json'
-        }),{
+
+    async createToken(email:string,password:string):Promise<Token | null>{
+        let connectionString=new UrlBuilder().url(auth).url("auth").url("createtoken").build()
+        const reponse= await this.post(connectionString,{
             "email": email,
             "password": password
         })
-        return reponse
+        return reponse.data ? new Token(reponse.data) : null
+    }
+
+    async revokeToken(token:Token):Promise<boolean>{
+        let connectionString=new UrlBuilder().url(auth).url("auth").url("revokerefreshtoken").build()
+        const reponse= await this.post(connectionString,{
+            "token": token
+            })
+        return reponse.statusCode===200 ? true : false
+    }
+
+    async refreshToken(token:Token):Promise<Token | null>{
+        let connectionString=new UrlBuilder().url(auth).url("auth").url("createtokenbyrefreshtoken").build()
+        const reponse= await this.post(connectionString,{
+            "token": token
+            })
+        return reponse.statusCode===200 ? reponse.data ? new Token(reponse.data): null : null
+    }
+
+
+    async createUser(username: string,email: string,password: string):Promise<User | null>{
+        let connectionString=new UrlBuilder().url(auth).url("User").url("createuser").build()
+        const reponse= await this.post(connectionString,{"userName": username,"email":email,"password": password})
+        return reponse.statusCode===200 ? reponse.data ? new User(reponse.data):null : null
     }
 }

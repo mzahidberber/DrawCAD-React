@@ -4,6 +4,7 @@ import { PointGeo } from "./Helper/PointGeo";
 import { CommandController } from "./CommandController";
 import { CommandType } from "./enum/CommandType";
 import { Radius } from "../Model/Radius";
+import { Cookie } from "./Service/Cookie";
 
 interface IDrawController{
 }
@@ -11,11 +12,14 @@ interface IDrawController{
 export class DrawController implements IDrawController{
     private commandControllers:CommandController[]=[]
     private selectedCommandController:CommandController
+    private _cookie:Cookie
     private clickList:PointGeo[]=[]
+
     constructor() {
         const firstCommandController=new CommandController()
         this.commandControllers.push(firstCommandController)
         this.selectedCommandController=this.commandControllers[0]
+        this._cookie=new Cookie()
     }
 
     startCommand(command:CommandType){
