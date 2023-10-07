@@ -27,7 +27,7 @@ export class UserController{
        
     async login(email:string,password:string):Promise<boolean>{
         if(!this._cookie.checkToken()) {
-            this._token=await this._userService.createToken(email,password)
+            this._token=await this._userService.createTokenAsync(email,password)
             if(this._token) {
                 this._cookie.setToken(this._token)
                 this._cookie.setEmail(email)

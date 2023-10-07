@@ -1,12 +1,16 @@
 import { Response } from "./Response"
+import { Token } from "./Token"
 
 export abstract class BaseService{
-    protected async post(connectionString:string,body:{},headers:Headers | null=null):Promise<Response>{
+    protected async postAsync(connectionString:string,body:{},token:Token|null=null):Promise<Response>{
         const response= await fetch(connectionString,{
           method:'POST',
-          headers: headers ?? new Headers({
-            'Content-Type': 'application/json'
-        }), 
+          headers: token==null ? new Headers({
+            'Content-Type': 'application/json',
+            }): new Headers({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`,
+            }), 
           body:JSON.stringify(body)
         })
         
@@ -17,12 +21,15 @@ export abstract class BaseService{
         return new Response(data)
     }
 
-    protected async get(url:string,headers:Headers | null=null):Promise<Response>{
+    protected async getAsync(url:string,token:Token|null=null):Promise<Response>{
         const response= await fetch(url,{
           method:'GET',
-          headers: headers ?? new Headers({
-            'Content-Type': 'application/json'
-        })})
+          headers: token==null ? new Headers({
+            'Content-Type': 'application/json',
+            }): new Headers({
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`,
+            })})
         if(!response.ok) {
           return new Response(null,response.status,{"error":response.statusText})
         }
@@ -30,12 +37,15 @@ export abstract class BaseService{
         return new Response(data)
     }
 
-    protected async put(url:string,body:{},headers:Headers | null=null):Promise<Response>{
+    protected async putAsync(url:string,body:{},token:Token|null=null):Promise<Response>{
         const response= await fetch(url,{
             method:'PUT',
-            headers: headers ?? new Headers({
-              'Content-Type': 'application/json'
-          }), 
+            headers: token==null ? new Headers({
+              'Content-Type': 'application/json',
+              }): new Headers({
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token.accessToken}`,
+              }), 
             body:JSON.stringify(body)
           })
           if(!response.ok) {
@@ -45,12 +55,15 @@ export abstract class BaseService{
         return new Response(data)
     }
 
-    protected async delete(url:string,body:{},headers:Headers | null=null):Promise<Response>{
+    protected async deleteAsync(url:string,body:{},token:Token|null=null):Promise<Response>{
         const response= await fetch(url,{
             method:'DELETE',
-            headers: headers ?? new Headers({
-              'Content-Type': 'application/json'
-          }), 
+            headers: token==null ? new Headers({
+              'Content-Type': 'application/json',
+              }): new Headers({
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token.accessToken}`,
+              }), 
             body:JSON.stringify(body)
         })
         if(!response.ok) {

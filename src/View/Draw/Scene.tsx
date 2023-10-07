@@ -1,4 +1,4 @@
-import React, { Component,useEffect } from 'react';
+import React, { Component } from 'react';
 import { PointGeo } from '../../Controller/Helper/PointGeo';
 import { DrawController } from '../../Controller/DrawController';
 import { ElementContext } from '../../ViewModel/DrawElements/ElementContext';
@@ -44,7 +44,7 @@ export class Scene extends Component<SceneProps,IState> {
     }
 
     public startCommand(command:CommandType):void{
-      this.props.contoller.startCommand(command)
+      this.props.contoller.startCommandAsync(command)
       this.elementContext.setElementType(command)
     }
 
@@ -104,7 +104,7 @@ export class Scene extends Component<SceneProps,IState> {
     }
   
     componentDidUpdate() {
-      console.log("update")
+      // console.log("update")
       this.clear()
       this.drawBackground(new PointGeo(0,0),new PointGeo(10000,10000))
       this.print()
@@ -121,13 +121,16 @@ export class Scene extends Component<SceneProps,IState> {
     click(event: React.MouseEvent<HTMLCanvasElement>){
         const x = event.nativeEvent.offsetX
         const y = event.nativeEvent.offsetY
-        const result= this.props.contoller.addPoint(this.props.sceneToScreen(new PointGeo(x,y)))
-        if(result) this.elementContext.createElementInstance(result)
-        var elemntObj=this.elementContext.elementObj
-        if(elemntObj){
-          this.addElement(elemntObj)
-          this.elementContext.setNull()
-        } 
+        this.props.contoller.addPointAsync(this.props.sceneToScreen(new PointGeo(x,y))).then((element)=>{
+          if(element){
+            this.elementContext.createElementInstance(element)
+            var elemntObj=this.elementContext.elementObj
+            if(elemntObj){
+              this.addElement(elemntObj)
+              this.elementContext.setNull()
+            } 
+          }
+        })
 
         for (let i = 0; i < this.state.items.length; i++) {
           const item = this.state.items[i];
@@ -142,8 +145,8 @@ export class Scene extends Component<SceneProps,IState> {
     }
 
     move(event:React.MouseEvent<HTMLCanvasElement>){
-      const x = event.nativeEvent.offsetX;
-      const y = event.nativeEvent.offsetY;
+      // const x = event.nativeEvent.offsetX;
+      // const y = event.nativeEvent.offsetY;
       // console.log(x,y)
       
     }
@@ -173,8 +176,8 @@ export class Scene extends Component<SceneProps,IState> {
     }
 
         let logHL=Math.log10(window.innerWidth)
-        let logVL=Math.log10(window.innerHeight)
-        let z1=10**(Math.round(logHL)+1)
+        // let logVL=Math.log10(window.innerHeight)
+        // let z1=10**(Math.round(logHL)+1)
         let z2=10**Math.round(logHL)
         let z3=10**(Math.round(logHL)-1)
 
