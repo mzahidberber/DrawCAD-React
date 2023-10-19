@@ -1,8 +1,8 @@
-import { BaseModelElement } from "./BaseModelElement"
+import { BaseModelElementAbstract } from "./abstract/BaseModelElementAbstract"
 import { SSAngleInfo } from "./enums/SSAngle"
 import { StateType } from "./enums/StateType"
 
-export class SSAngle extends BaseModelElement{
+export class SSAngle extends BaseModelElementAbstract{
     private _type: string
     public value: number
     private _elementId: number

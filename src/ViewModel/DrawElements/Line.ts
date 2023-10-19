@@ -4,15 +4,18 @@ import { GeoMath } from "../../Controller/Helper/GeoMath"
 import { PointGeo } from "../../Controller/Helper/PointGeo";
 import { Point } from "../../Model/Point";
 import { BaseElementAbstract } from "./abstract/BaseElementAbstract";
+import { Color } from "../Others/Color";
 export class Line extends BaseElementAbstract {
     private p1:Point | null =null
     private p2:Point | null =null
-    
     
     constructor (element:DrawElement){
         super(element)
         this.p1=element.points[0]
         this.p2=element.points[1]
+        console.log(element)
+        if(element.layer)
+            this._color=new Color(element.layer.pen.red,element.layer.pen.green,element.layer.pen.blue)
     }
     
     
@@ -42,7 +45,7 @@ export class Line extends BaseElementAbstract {
         
     }
 
-    click(x:number,y:number): void {
+    click(): void {
         
     }
 }

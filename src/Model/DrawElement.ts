@@ -1,15 +1,17 @@
-import { BaseModelElement } from "./BaseModelElement"
+import { Layer } from "./Layer"
 import { Point } from "./Point"
 import { Radius } from "./Radius"
 import { SSAngle } from "./SSAngle"
+import { BaseModelElementAbstract } from "./abstract/BaseModelElementAbstract"
 import { ElementInfo } from "./enums/ElementInfo"
 import { StateType } from "./enums/StateType"
 
-export class DrawElement extends BaseModelElement{
+export class DrawElement extends BaseModelElementAbstract{
     public penId: number
     public elementTypeId: number
     public layerId: number
-    // public _layerName:string
+    public layerName:string | null = null
+    public layer:Layer | null = null
     public ssAngles: Array<SSAngle>
     public radiuses: Array<Radius>
     public points: Array<Point>

@@ -9,7 +9,7 @@ export class Default extends BaseElementAbstract {
     paint(path:Path2D): void {
         throw new Error("Method not implemented.");
     }
-    click(x: number, y: number): void {
+    click(): void {
         throw new Error("Method not implemented.");
     }
 

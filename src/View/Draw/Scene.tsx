@@ -34,7 +34,7 @@ export class Scene extends Component<SceneProps,IState> {
     constructor(props: SceneProps) {
       super(props)
       this.state = {
-        items: [],
+        items: []
       }
       this.elementContext=new ElementContext()
       this.canvasRef = React.createRef()
@@ -64,8 +64,9 @@ export class Scene extends Component<SceneProps,IState> {
           h.scaleSelf(1,-1)
           var nnPath= this.trasformPath(pathBo,h)
           element.path=nnPath
-          this._scontext.lineWidth = 1
-          this._scontext.strokeStyle = "white";
+          const layer=this.props.contoller.layers.find((x)=>x.id==element.element.layerId)
+          this._scontext.lineWidth = layer?.thickness ?? 1
+          this._scontext.strokeStyle = `rgb(${layer?.pen?.red},${layer?.pen?.green},${layer?.pen?.blue})`
           this._scontext.fillStyle="transparent"
           this._scontext.fill(nnPath)
           this._scontext.stroke(nnPath)
@@ -78,8 +79,8 @@ export class Scene extends Component<SceneProps,IState> {
           m.f = this.props.width/2;
           m.scaleSelf(1,-1)
           var nPath= this.trasformPath(path,m)
-          this._scontext.lineWidth = 2
-          this._scontext.strokeStyle = "red";
+          this._scontext.lineWidth = layer?.thickness ?? 1
+          this._scontext.strokeStyle = `rgb(${layer?.pen?.red},${layer?.pen?.green},${layer?.pen?.blue})`
           this._scontext.stroke(nPath)
 
           
@@ -136,7 +137,7 @@ export class Scene extends Component<SceneProps,IState> {
           const item = this.state.items[i];
           if(this._scontext && item.path){
             if (this._scontext.isPointInPath(item.path,x, y)){
-              console.log(item)
+              console.log(item.click())
               
             }
           }

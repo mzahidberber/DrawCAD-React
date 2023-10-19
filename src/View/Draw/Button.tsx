@@ -4,6 +4,7 @@ import line from '../../static/img/Line.png';
 import rectange from '../../static/img/Rectangle.png';
 import circle from '../../static/img/Circle.png';
 import move from '../../static/img/move.png';
+import layer from '../../static/img/Layer.png';
 import { CommandType } from '../../Controller/enum/CommandType';
 import { Window } from './Window';
 
@@ -36,6 +37,8 @@ class DrawButton extends Component<DrawButtonProp> {
             return circle
         case 2:
             return rectange
+        case 6:
+            return layer
         default:
             return move
     }
@@ -49,6 +52,8 @@ class DrawButton extends Component<DrawButtonProp> {
           return this.props.window.startCommand(CommandType.circle)
       case 2:
           return this.props.window.startCommand(CommandType.rectangle)
+      case 6:
+          return this.props.window.showLayerBox()
       default:
           return ''
     }

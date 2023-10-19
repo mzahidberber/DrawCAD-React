@@ -14,6 +14,7 @@ export class EditTools extends Component<IEditTools> {
                     <DrawButton window={this.props.window} type={3} />
                     <DrawButton window={this.props.window} type={4} />
                     <DrawButton window={this.props.window} type={5} />
+                    <DrawButton window={this.props.window} type={6} />
                 </div>
             </div>
     );

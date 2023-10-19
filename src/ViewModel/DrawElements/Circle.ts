@@ -30,7 +30,7 @@ export class Circle extends BaseElementAbstract {
             
     }
 
-    click(x: number, y: number): void {
+    click(): void {
         throw new Error("Method not implemented.");
     }
 

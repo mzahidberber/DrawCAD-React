@@ -1,8 +1,9 @@
-import { BaseModelElement } from "./BaseModelElement"
+
+import { BaseModelElementAbstract } from "./abstract/BaseModelElementAbstract"
 import { RadiusInfo } from "./enums/RadiusInfo"
 import { StateType } from "./enums/StateType"
 
-export class Radius extends BaseModelElement{
+export class Radius extends BaseModelElementAbstract{
     public value: number
     private _elementId: number
 

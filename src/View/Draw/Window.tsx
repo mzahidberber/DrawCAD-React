@@ -8,6 +8,7 @@ import React from "react";
 import { CommandType } from "../../Controller/enum/CommandType";
 import { LoginForm } from "../User/LoginForm";
 import { UserController } from '../../Controller/UserController';
+import LayerBoxTool from './LayerBoxTool';
 
 
 
@@ -15,11 +16,13 @@ export class Window extends Component{
     private drawController:DrawController
     private userController:UserController
     private viewRef:RefObject<GraphicsView>
+    private layerBoxRef:RefObject<LayerBoxTool>
     constructor(props:any){
         super(props)
         this.drawController=new DrawController()
         this.userController=new UserController()
         this.viewRef=React.createRef()
+        this.layerBoxRef=React.createRef()
     }
 
     componentDidMount() {
@@ -30,9 +33,13 @@ export class Window extends Component{
         
     }
 
+    getLayers=()=>this.drawController.layers
+
     startCommand(command:CommandType){
         this.viewRef.current?.startCommand(command)
     }
+
+    showLayerBox=()=>this.layerBoxRef.current?.handleShow()
 
     render() {
         return (
@@ -41,6 +48,7 @@ export class Window extends Component{
             <GraphicsView ref={this.viewRef} controller={this.drawController}/>
             <ElementTools window={this} />
             <EditTools window={this} />
+            <LayerBoxTool ref={this.layerBoxRef} window={this}/>
             </>
         )
     }

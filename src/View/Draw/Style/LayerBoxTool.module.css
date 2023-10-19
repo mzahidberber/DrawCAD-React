@@ -1,0 +1,18 @@
+.customoffcanvas{
+    width:auto !important;
+}  
+
+td,th {
+    font-size: 14px;
+}
+
+.lockBtn{
+    padding: 0;
+    background-color: transparent !important;
+    border: 0;
+}
+
+img{
+    width: 25px;
+    height: 25px;
+}

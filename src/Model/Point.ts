@@ -1,8 +1,8 @@
-import { BaseModelElement } from "./BaseModelElement"
+import { BaseModelElementAbstract } from "./abstract/BaseModelElementAbstract"
 import { PointInfo } from "./enums/PointInfo"
 import { StateType } from "./enums/StateType"
 
-export class Point extends BaseModelElement{
+export class Point extends BaseModelElementAbstract{
     public x: number
     public y: number
     public z: number=1
